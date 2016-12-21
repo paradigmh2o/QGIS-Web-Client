@@ -75,77 +75,82 @@ var layerImageFormats = layerImageFormats || []; // use config from GlobalOption
 customInit();
 
 Ext.onReady(function () {
-	//dpi detection
-	screenDpi = document.getElementById("dpiDetection").offsetHeight;
-	OpenLayers.DOTS_PER_INCH = screenDpi;
-	
-	//fix for IE <= 8, missing indexOf function
-	if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
-        "use strict";
-        if (this == null) {
-            throw new TypeError();
-        }
-        var t = Object(this);
-        var len = t.length >>> 0;
-        if (len === 0) {
+    //dpi detection
+    screenDpi = document.getElementById("dpiDetection").offsetHeight;
+    OpenLayers.DOTS_PER_INCH = screenDpi;
+    
+    //fix for IE <= 8, missing indexOf function
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
+            "use strict";
+            if (this == null) {
+                throw new TypeError();
+            }
+            var t = Object(this);
+            var len = t.length >>> 0;
+            if (len === 0) {
+                return -1;
+            }
+            var n = 0;
+            if (arguments.length > 1) {
+                n = Number(arguments[1]);
+                if (n != n) { // shortcut for verifying if it's NaN
+                    n = 0;
+                } else if (n != 0 && n != Infinity && n != -Infinity) {
+                    n = (n > 0 || -1) * Math.floor(Math.abs(n));
+                }
+            }
+            if (n >= len) {
+                return -1;
+            }
+            var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
+            for (; k < len; k++) {
+                if (k in t && t[k] === searchElement) {
+                    return k;
+                }
+            }
             return -1;
         }
-        var n = 0;
-        if (arguments.length > 1) {
-            n = Number(arguments[1]);
-            if (n != n) { // shortcut for verifying if it's NaN
-                n = 0;
-            } else if (n != 0 && n != Infinity && n != -Infinity) {
-                n = (n > 0 || -1) * Math.floor(Math.abs(n));
-            }
-        }
-        if (n >= len) {
-            return -1;
-        }
-        var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
-        for (; k < len; k++) {
-            if (k in t && t[k] === searchElement) {
-                return k;
-            }
-        }
-        return -1;
     }
-	}
 
-	//some references
-	layerTree = Ext.getCmp('LayerTree');
-	mainStatusText = Ext.getCmp('mainStatusText');
-	rightStatusText = Ext.getCmp('rightStatusText');
+    //some references
+    layerTree = Ext.getCmp('LayerTree');
+    mainStatusText = Ext.getCmp('mainStatusText');
+    rightStatusText = Ext.getCmp('rightStatusText');
 
-	//set some status messsages
-	mainStatusText.setText(mapAppLoadingString[lang]);
+  //set some status messsages
+  mainStatusText.setText(mapAppLoadingString[lang]);
 
-	//OpenstreetMap background layers
-	if (enableOSMMaps) {	    
-        	arrayOSM = ["http://otile1.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
-                    	"http://otile2.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
-                    	"http://otile3.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
-                    	"http://otile4.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg"];
-        	arrayAerial = ["http://otile1.mqcdn.com/tiles/1.0.0/sat/${z}/${x}/${y}.jpg",
-                        "http://otile2.mqcdn.com/tiles/1.0.0/sat/${z}/${x}/${y}.jpg",
-                        "http://otile3.mqcdn.com/tiles/1.0.0/sat/${z}/${x}/${y}.jpg",
-                        "http://otile4.mqcdn.com/tiles/1.0.0/sat/${z}/${x}/${y}.jpg"];
-       		arrayCycle = ["http://a.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
-   			"http://b.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
-   			"http://c.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png"];
+    //OpenstreetMap background layers
+    if (enableOSMMaps) {
 
-        	baseOSM = new OpenLayers.Layer.OSM("MapQuest-OSM Tiles", arrayOSM, {numZoomLevels: 19, attribution: "Data, imagery and map information provided by <a href='http://www.mapquest.com/'  target='_blank'>MapQuest</a>, <a href='http://www.openstreetmap.org/' target='_blank'>Open Street Map</a> and contributors, <a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'>CC-BY-SA</a>  <img src='http://developer.mapquest.com/content/osm/mq_logo.png' border='0'>"} );
-       		baseAerial = new OpenLayers.Layer.OSM("MapQuest Open Aerial Tiles (zoom < 11)", arrayAerial, {numZoomLevels: 11, attribution: "Data, imagery and map information provided by <a href='http://www.mapquest.com/'  target='_blank'>MapQuest</a>, <a href='http://www.openstreetmap.org/' target='_blank'>Open Street Map</a> and contributors, <a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'>CC-BY-SA</a>  <img src='http://developer.mapquest.com/content/osm/mq_logo.png' border='0'>"});
-		mapnik= new OpenLayers.Layer.OSM("OpenStreetMap (mapnik)");
-		cycle = new OpenLayers.Layer.OSM("OpenCycleMap",arrayCycle, {attribution: "<a href='http://www.openstreetmap.org/' target='_blank'>Open Street Map</a> and contributors. Tiles courtesy of<a target='_blank' href='http://www.thunderforest.com/'>Andy Allan</a>"});
+            arrayOSM = ["http://a.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png",
+                        "http://b.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png",
+                        "http://c.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png",
+                        "http://d.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png"];
 
+            arrayAerial = ["http://a.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png",
+                           "http://b.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png",
+                           "http://c.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png",
+                           "http://d.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png"];
 
-		baseLayers.push(mapnik)
-		baseLayers.push(baseOSM);
-		baseLayers.push(cycle);
-		baseLayers.push(baseAerial);
-	}
+            arrayCycle = ["http://a.tile.stamen.com/watercolor/${z}/${x}/${y}.jpg",
+                          "http://b.tile.stamen.com/watercolor/${z}/${x}/${y}.jpg",
+                          "http://c.tile.stamen.com/watercolor/${z}/${x}/${y}.jpg",
+                          "http://d.tile.stamen.com/watercolor/${z}/${x}/${y}.jpg"];
+
+        baseAerial = new OpenLayers.Layer.OSM("Light Theme (CartoDB)", arrayAerial, {numZoomLevels: 19, attribution: "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> &copy; <a href='http://cartodb.com/attributions'>CartoDB</a>"});
+        baseOSM = new OpenLayers.Layer.OSM("Dark Theme (CartoDB)", arrayOSM, {numZoomLevels: 19, attribution: "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> &copy; <a href='http://cartodb.com/attributions'>CartoDB</a>"});
+        mapnik= new OpenLayers.Layer.OSM("Open Street Map");
+        //cycle = new OpenLayers.Layer.OSM("Watercolor", arrayCycle, {numZoomLevels: 19, attribution: "Stuff Here"});
+        cycle = new OpenLayers.Layer.OSM("Watercolor", arrayCycle, {numZoomLevels: 19, attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a>."});
+
+        baseLayers.push(cycle);
+        baseLayers.push(baseAerial);
+        baseLayers.push(baseOSM);
+        baseLayers.push(mapnik)
+
+}
 
 	if (enableGoogleCommercialMaps) {
 		googleSatelliteLayer = new OpenLayers.Layer.Google(
